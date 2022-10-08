@@ -10,6 +10,9 @@ import bodyParser from "body-parser";
 import { IOldUser } from "./src/types/oldDb/user";
 import { IUser } from "./src/types/user";
 import { IOldVehicle } from "./src/types/oldDb/vehicle";
+import { mapUsers } from "./src/mappingFunctions/mapUsers";
+import { mapVehicles } from "./src/mappingFunctions/mapVehicles";
+import { IList } from "./src/types/oldDb/list";
 
 dotenv.config();
 
@@ -55,26 +58,14 @@ app.get("/users", async (req, res) => {
 
     rebelDb.connect(function (err) {
       if (err) throw err;
-      rebelDb.query(`SELECT * FROM user`, function (err: MysqlError, result: IOldUser[]) {
+      rebelDb.query(`SELECT * FROM user`, function (err: MysqlError, oldUsers: IOldUser[]) {
         if (err) throw err;
 
         rebelDb.end(function (err) {
           if (err) throw err;
         });
 
-        const newUser = result.map<IUser>((user) => ({
-          oldId: user.id,
-          avatarImage: [`${user.id}.jpg`], // check if file exist
-          email: user.email,
-          city: user.city,
-          country: user.country,
-          aboutUser: user.about,
-          firstName: user.name,
-          lastName: user.surname,
-          name: user.nick,
-          yearOfBirth: user.birthyear.toString(),
-          gender: user.gender === "m" ? "male" : user.gender === "f" ? "female" : "",
-        }));
+        const newUser = mapUsers(oldUsers);
 
         return res.status(200).json(newUser.slice(0, 9));
       });
@@ -100,23 +91,20 @@ app.get("/vehicles", async (req, res) => {
     rebelDb.connect(function (err) {
       if (err) throw err;
 
+      type VehiclesResponseType = [IOldVehicle[], IList[]];
+
       rebelDb.query(
         // `SELECT product.*, l_brake.name as brakeName FROM product CROSS JOIN l_brake ON product.brake_id=l_brake.id`,
         `SELECT * FROM product; SELECT * FROM l_brake`,
-        function (
-          err: MysqlError,
-          [oldVehicles, l_brake]: [IOldVehicle[], { id: number; name: string }[]]
-        ) {
+        function (err: MysqlError, [oldVehicles, l_brake]: VehiclesResponseType) {
           if (err) throw err;
 
           rebelDb.end(function (err) {
             if (err) throw err;
           });
 
-          const vehicles = oldVehicles.map((oldVehicle) => ({
-            ...oldVehicle,
-            brake_id: l_brake.find((brake) => brake.id === oldVehicle.brake_id)?.name,
-          }));
+          const vehicles = mapVehicles({ oldVehicles, l_brake });
+
           return res.status(200).json(vehicles.slice(0, 9));
         }
       );
