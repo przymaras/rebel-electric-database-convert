@@ -7,8 +7,9 @@ import type { MysqlError } from "mysql";
 import rateLimit from "express-rate-limit";
 import cors from "cors";
 import bodyParser from "body-parser";
+import util from "util";
+import ImageKit from "imagekit";
 import { IOldUser } from "./src/types/oldDb/user";
-import { IUser } from "./src/types/user";
 import { IOldVehicle } from "./src/types/oldDb/vehicle";
 import { mapUsers } from "./src/mappingFunctions/mapUsers";
 import { mapVehicles } from "./src/mappingFunctions/mapVehicles";
@@ -17,6 +18,7 @@ import { l_brake_type } from "./src/types/oldDb/l_brake";
 import { IProductPhoto } from "./src/types/oldDb/product_photo";
 import { l_battery_instal_type } from "./src/types/oldDb/l_battery_install";
 import { l_accumulator_type } from "./src/types/oldDb/l_accumulator";
+import { errorImages1 } from "./src/uploadResults1";
 
 dotenv.config();
 
@@ -51,6 +53,107 @@ app.use(bodyParser.json());
 app.get("/", (req, res) => res.send("Hello World!"));
 
 // Our endpoint
+app.get("/upload-vehicle-images", async (req, res) => {
+  const conn = mysql.createConnection({
+    host: "mn30.webd.pl",
+    user: `${process.env.SQL_USER}`,
+    password: `${process.env.SQL_PASSWORD}`,
+    database: `${process.env.SQL_DATABASE}`,
+  });
+
+  const query = util
+    .promisify<string | mysql.QueryOptions, { id: number; product_id: number }[]>(conn.query)
+    .bind(conn);
+
+  const imagekit: ImageKit = new ImageKit({
+    publicKey: process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY ?? "",
+    privateKey: process.env.IMAGEKIT_PRIVATE_KEY ?? "",
+    urlEndpoint: "https://ik.imagekit.io/rebelelectric/",
+  });
+
+  try {
+    const uploadedImages: number[] = [];
+    const errorImages: number[] = [];
+    const photos = await query(`SELECT * FROM product_photo`);
+    conn.end();
+
+    const photosIds = photos.map((photo) => photo.id);
+
+    await Promise.allSettled(
+      photosIds.map((photoId) => {
+        return imagekit
+          .upload({
+            file: `https://bikel.pl/rebel/${photoId}`, //required
+            fileName: `v1-${photoId}.jpg`, //required
+            folder: "/v1",
+            useUniqueFileName: false,
+          })
+          .then(() => {
+            uploadedImages.push(photoId);
+            console.info(`Uploaded: ${photoId}`);
+          })
+          .catch(() => {
+            errorImages.push(photoId);
+            console.error(`Error upload: ${photoId}`);
+          });
+      })
+    );
+
+    errorImages.sort((a, b) => a - b);
+    uploadedImages.sort((a, b) => a - b);
+
+    return res.status(200).json({ message: "Upload results", errorImages, uploadedImages });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      message: err instanceof Error ? err.message : err,
+    });
+  }
+});
+
+app.get("/upload-vehicle-images-retry", async (req, res) => {
+  const imagekit: ImageKit = new ImageKit({
+    publicKey: process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY ?? "",
+    privateKey: process.env.IMAGEKIT_PRIVATE_KEY ?? "",
+    urlEndpoint: "https://ik.imagekit.io/rebelelectric/",
+  });
+
+  try {
+    const uploadedImages: number[] = [];
+    const errorImages: number[] = [];
+
+    await Promise.allSettled(
+      errorImages1.map((photoId) => {
+        return imagekit
+          .upload({
+            file: `https://bikel.pl/rebel/${photoId}`, //required
+            fileName: `v1-${photoId}.jpg`, //required
+            folder: "/v1",
+            useUniqueFileName: false,
+          })
+          .then(() => {
+            uploadedImages.push(photoId);
+            console.info(`Uploaded: ${photoId}`);
+          })
+          .catch(() => {
+            errorImages.push(photoId);
+            console.error(`Error upload: ${photoId}`);
+          });
+      })
+    );
+
+    errorImages.sort((a, b) => a - b);
+    uploadedImages.sort((a, b) => a - b);
+
+    return res.status(200).json({ message: "Upload results", errorImages, uploadedImages });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      message: err instanceof Error ? err.message : err,
+    });
+  }
+});
+
 app.get("/users", async (req, res) => {
   try {
     const rebelDb = mysql.createConnection({

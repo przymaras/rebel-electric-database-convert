@@ -45,7 +45,7 @@ export const mapVehicles = ({
 
     const vehicleImages = product_photo
       .filter((photo) => photo.product_id === oldVehicle.id)
-      .map((photo) => `${photo.id}.jpg`);
+      .map((photo) => `v1-${photo.id}.jpg`);
 
     const oldBase = l_base_brand.find((brand) => brand.id === oldVehicle.brand_id)?.name.trim();
     const oldModel = l_base_model.find((model) => model.id === oldVehicle.model_id)?.name.trim();
