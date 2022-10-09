@@ -4,12 +4,12 @@ import dotenv from "dotenv";
 import express from "express";
 import rateLimit from "express-rate-limit";
 
+dotenv.config();
+
 import { uploadVehicleImages } from "./src/routes/upload-vehicle-images";
 import { uploadVehicleImagesRetry } from "./src/routes/upload-vehicle-images-retry";
 import { usersRoute } from "./src/routes/users";
 import { vehiclesRoute } from "./src/routes/vehicles";
-
-dotenv.config();
 
 const app = express();
 const port = 3030;

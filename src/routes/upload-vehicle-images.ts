@@ -6,7 +6,7 @@ import util from "util";
 import ImageKit from "imagekit";
 
 export const uploadVehicleImages = async (req: Request, res: Response) => {
-  const conn = mysql.createConnection({
+  const rebelDb = mysql.createConnection({
     host: "mn30.webd.pl",
     user: `${process.env.SQL_USER}`,
     password: `${process.env.SQL_PASSWORD}`,
@@ -14,8 +14,8 @@ export const uploadVehicleImages = async (req: Request, res: Response) => {
   });
 
   const query = util
-    .promisify<string | mysql.QueryOptions, { id: number; product_id: number }[]>(conn.query)
-    .bind(conn);
+    .promisify<string | mysql.QueryOptions, { id: number; product_id: number }[]>(rebelDb.query)
+    .bind(rebelDb);
 
   const imagekit: ImageKit = new ImageKit({
     publicKey: process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY ?? "",
@@ -27,7 +27,7 @@ export const uploadVehicleImages = async (req: Request, res: Response) => {
     const uploadedImages: number[] = [];
     const errorImages: number[] = [];
     const photos = await query(`SELECT * FROM product_photo`);
-    conn.end();
+    rebelDb.end();
 
     const photosIds = photos.map((photo) => photo.id);
 

@@ -1,39 +1,48 @@
 import type { Request, Response } from "express";
-import type { MysqlError } from "mysql";
 
+import util from "util";
 import mysql from "mysql";
 
 import type { IOldUser } from "../types/oldDb/user";
 
 import { mapUsers } from "../mappingFunctions/mapUsers";
+import { mongoDbRequest } from "../services/mongoDb/mongoDbRequest";
+import { mDbAddUsers } from "../services/mongoDb/collections";
 
 export const usersRoute = async (req: Request, res: Response) => {
+  const rebelDb = mysql.createConnection({
+    host: "mn30.webd.pl",
+    user: `${process.env.SQL_USER}`,
+    password: `${process.env.SQL_PASSWORD}`,
+    database: `${process.env.SQL_DATABASE}`,
+  });
+
+  const query = util
+    .promisify<string | mysql.QueryOptions, IOldUser[]>(rebelDb.query)
+    .bind(rebelDb);
+
   try {
-    const rebelDb = mysql.createConnection({
-      host: "mn30.webd.pl",
-      user: `${process.env.SQL_USER}`,
-      password: `${process.env.SQL_PASSWORD}`,
-      database: `${process.env.SQL_DATABASE}`,
+    const oldUsers = await query(`SELECT * FROM user`);
+    rebelDb.end();
+
+    const newUsers = mapUsers(oldUsers).slice(0, 9);
+
+    const mongoResponse = await mongoDbRequest(async (db) => {
+      const addUsers = await mDbAddUsers(db, newUsers);
+      return { addUsers };
     });
 
-    rebelDb.connect(function (err) {
-      if (err) throw err;
-      rebelDb.query(`SELECT * FROM user`, function (err: MysqlError, oldUsers: IOldUser[]) {
-        if (err) throw err;
+    if (!mongoResponse) {
+      return res.status(500).json({ message: "Can't connect to mongoDb" });
+    }
 
-        rebelDb.end(function (err) {
-          if (err) throw err;
-        });
+    const { addUsers } = mongoResponse;
 
-        const newUser = mapUsers(oldUsers);
-
-        return res.status(200).json(newUser.slice(0, 9));
-      });
-    });
+    return res.status(200).json({ newUsers, addUsers });
   } catch (err) {
     return res.status(500).json({
       success: false,
-      message: err instanceof Error ? err.message : "Unknown error",
+      message: err instanceof Error ? err.message : err,
     });
   }
 };

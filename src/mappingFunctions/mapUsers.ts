@@ -3,7 +3,7 @@ import { IUser } from "../types/user";
 
 export const mapUsers = (oldUsers: IOldUser[]) => {
   return oldUsers.map<IUser>((user) => ({
-    oldId: user.id,
+    v1Id: user.id,
     avatarImage: [`${user.id}.jpg`], // check if file exist
     email: user.email,
     city: user.city,

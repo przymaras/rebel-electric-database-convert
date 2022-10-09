@@ -1,3 +1,5 @@
+import type { ObjectId } from "mongodb";
+
 export interface IUserAccount {
   avatarImage: string[];
   city: string;
@@ -11,8 +13,8 @@ export interface IUserAccount {
   yearOfBirth: string;
 }
 export interface IUser extends IUserAccount {
-  _id?: string;
-  oldId: number;
+  _id?: ObjectId;
+  v1Id: number;
   badges?: string[];
   emailVerified?: Date;
   password?: string;
