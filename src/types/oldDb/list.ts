@@ -1,4 +1,4 @@
-export interface IList {
+export interface IList<T = string> {
   id: number;
-  name: string;
+  name: T;
 }

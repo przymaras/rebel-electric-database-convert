@@ -13,6 +13,10 @@ import { IOldVehicle } from "./src/types/oldDb/vehicle";
 import { mapUsers } from "./src/mappingFunctions/mapUsers";
 import { mapVehicles } from "./src/mappingFunctions/mapVehicles";
 import { IList } from "./src/types/oldDb/list";
+import { l_brake_type } from "./src/types/oldDb/l_brake";
+import { IProductPhoto } from "./src/types/oldDb/product_photo";
+import { l_battery_instal_type } from "./src/types/oldDb/l_battery_install";
+import { l_accumulator_type } from "./src/types/oldDb/l_accumulator";
 
 dotenv.config();
 
@@ -91,19 +95,53 @@ app.get("/vehicles", async (req, res) => {
     rebelDb.connect(function (err) {
       if (err) throw err;
 
-      type VehiclesResponseType = [IOldVehicle[], IList[]];
+      type VehiclesResponseType = [
+        IOldVehicle[],
+        IList<l_brake_type>[],
+        IProductPhoto[],
+        IList[],
+        IList[],
+        IList<l_battery_instal_type>[],
+        IList<l_accumulator_type>[]
+      ];
 
       rebelDb.query(
         // `SELECT product.*, l_brake.name as brakeName FROM product CROSS JOIN l_brake ON product.brake_id=l_brake.id`,
-        `SELECT * FROM product; SELECT * FROM l_brake`,
-        function (err: MysqlError, [oldVehicles, l_brake]: VehiclesResponseType) {
+        `SELECT * FROM product; 
+         SELECT * FROM l_brake; 
+         SELECT * FROM product_photo; 
+         SELECT * FROM l_base_brand;
+         SELECT * FROM l_base_model;
+         SELECT * FROM l_battery_install;
+         SELECT * FROM l_accumulator;
+         `,
+        function (
+          err: MysqlError,
+          [
+            oldVehicles,
+            l_brake,
+            product_photo,
+            l_base_brand,
+            l_base_model,
+            l_battery_install,
+            l_accumulator,
+          ]: VehiclesResponseType
+        ) {
           if (err) throw err;
 
           rebelDb.end(function (err) {
             if (err) throw err;
           });
 
-          const vehicles = mapVehicles({ oldVehicles, l_brake });
+          const vehicles = mapVehicles({
+            oldVehicles,
+            l_brake,
+            product_photo,
+            l_base_brand,
+            l_base_model,
+            l_battery_install,
+            l_accumulator,
+          });
 
           return res.status(200).json(vehicles.slice(0, 9));
         }
