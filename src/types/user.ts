@@ -14,7 +14,7 @@ export interface IUserAccount {
 }
 export interface IUser extends IUserAccount {
   _id?: ObjectId;
-  v1Id: number;
+  v1Id?: number;
   badges?: string[];
   emailVerified?: Date;
   password?: string;
@@ -23,6 +23,7 @@ export interface IUser extends IUserAccount {
   profileViewsCount?: string;
   testsResults?: string;
   likedVehicles?: string[];
+  v1LikedVehicles?: number[];
 }
 
 export interface IPassword {

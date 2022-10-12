@@ -8,8 +8,7 @@ dotenv.config();
 
 import { uploadVehicleImages } from "./src/routes/upload-vehicle-images";
 import { uploadVehicleImagesRetry } from "./src/routes/upload-vehicle-images-retry";
-import { usersRoute } from "./src/routes/users";
-import { vehiclesRoute } from "./src/routes/vehicles";
+import { importRoute } from "./src/routes/import";
 
 const app = express();
 const port = 3030;
@@ -37,9 +36,7 @@ app.get("/upload-vehicle-images", uploadVehicleImages);
 
 app.get("/upload-vehicle-images-retry", uploadVehicleImagesRetry);
 
-app.get("/users", usersRoute);
-
-app.get("/vehicles", vehiclesRoute);
+app.get("/import", importRoute);
 
 // This spins up our sever and generates logs for us to use.
 app.listen(port, () => console.log(`Rebel electric database convert API listens on port ${port}!`));

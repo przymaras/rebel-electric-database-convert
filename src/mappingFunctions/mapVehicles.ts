@@ -1,4 +1,6 @@
+import { ObjectId } from "mongodb";
 import { IEBikeComplete } from "../types/hangar";
+import { IBikeLike } from "../types/oldDb/bike_like";
 import { categoryMapOldToNew } from "../types/oldDb/category";
 import { IList } from "../types/oldDb/list";
 import { cellsTypeMapOldToNew, l_accumulator_type } from "../types/oldDb/l_accumulator";
@@ -17,6 +19,7 @@ interface MapVehiclesProps {
   l_base_model: IList[];
   l_battery_install: IList<l_battery_instal_type>[];
   l_accumulator: IList<l_accumulator_type>[];
+  bike_like: IBikeLike[];
 }
 
 export const mapVehicles = ({
@@ -27,6 +30,7 @@ export const mapVehicles = ({
   l_base_model,
   l_battery_install,
   l_accumulator,
+  bike_like,
 }: MapVehiclesProps) => {
   return oldVehicles.map<IEBikeComplete>((oldVehicle) => {
     const brakes =
@@ -45,6 +49,9 @@ export const mapVehicles = ({
 
     const vehicleImages = product_photo
       .filter((photo) => photo.product_id === oldVehicle.id)
+      .sort((a, b) =>
+        a.id === oldVehicle.main_photo_id ? -1 : b.id === oldVehicle.main_photo_id ? 1 : 0
+      )
       .map((photo) => `v1-${photo.id}.jpg`);
 
     const oldBase = l_base_brand.find((brand) => brand.id === oldVehicle.brand_id)?.name.trim();
@@ -88,6 +95,10 @@ export const mapVehicles = ({
       capacityUnit = "Wh";
     }
 
+    const v1LikedUsers = bike_like
+      .filter((like) => like.bike_id === oldVehicle.id)
+      .map((like) => like.user_id);
+
     return {
       // ctrlManuf: "",
       // ctrlManufOther: "",
@@ -97,13 +108,14 @@ export const mapVehicles = ({
       // motorManufOther: "",
       // motorModel: "",
       // motorModelOther: "",
+      _id: new ObjectId(),
       bikeBase,
       brakes,
       brakesOther,
       createdAt: oldVehicle.date_added,
       description: oldVehicle.txt,
-      oldId: oldVehicle.id,
-      oldOwnerId: oldVehicle.user_id.toString(),
+      v1Id: oldVehicle.id,
+      v1OwnerId: oldVehicle.user_id.toString(),
       projectName: oldVehicle.name,
       vehicleImages,
       video: oldVehicle.youtube,
@@ -123,6 +135,8 @@ export const mapVehicles = ({
       vmaxUnit: "kph",
       rangeUnit: "km",
       category: categoryMapOldToNew[oldVehicle.kind_id as keyof typeof categoryMapOldToNew],
+      v1LikedUsers,
+      v1ViewsCount: oldVehicle.views,
     };
   });
 };

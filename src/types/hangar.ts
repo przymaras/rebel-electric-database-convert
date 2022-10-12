@@ -1,12 +1,18 @@
+import type { ObjectId } from "mongodb";
+
 export interface IEBikeComplete extends Partial<IEBikeGeneral> {
-  oldId: number;
+  v1Id?: number;
+  v1OwnerId?: string;
+  v1LikedUsers?: number[];
+  v1ViewsCount?: number;
   createdAt: string;
-  oldOwnerId: string;
   likesCount?: string;
-  likedUsers?: string[];
+  likedUsers?: ObjectId[];
   viewsCount?: string;
+  ownerId?: ObjectId;
 }
 export interface IEBikeGeneral {
+  _id: ObjectId;
   projectName: string;
   video: string;
   description: string;
