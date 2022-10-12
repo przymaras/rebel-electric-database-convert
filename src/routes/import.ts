@@ -16,7 +16,7 @@ import { mapVehicles } from "../mappingFunctions/mapVehicles";
 import { mapOldToNewIdsInUsers } from "../mappingFunctions/mapOldToNewIdsInUsers";
 import { mapOldToNewIdsInVehicles } from "../mappingFunctions/mapOldToNewIdsInVehicles";
 import { mongoDbRequest } from "../services/mongoDb/mongoDbRequest";
-import { mDbAddUsers } from "../services/mongoDb/collections";
+import { mDbAddUsers, mDbAddVehicles } from "../services/mongoDb/collections";
 
 type QueryResponseType = [
   IOldUser[],
@@ -89,14 +89,16 @@ export const importRoute = async (req: Request, res: Response) => {
     if (req.query.update) {
       const mongoResponse = await mongoDbRequest(async (db) => {
         const addUsers = await mDbAddUsers(db, newUsersWithNewIds);
-        return { addUsers };
+        const addVehicles = await mDbAddVehicles(db, newVehiclesWithNewIds);
+        return { addUsers, addVehicles };
       });
 
       if (!mongoResponse) {
         return res.status(500).json({ message: "Can't connect to mongoDb" });
       }
 
-      const { addUsers } = mongoResponse;
+      const { addUsers, addVehicles } = mongoResponse;
+
       console.info("update DB");
     } else {
       console.info("preview only");
