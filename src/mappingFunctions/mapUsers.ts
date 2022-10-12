@@ -14,14 +14,14 @@ export const mapUsers = ({ oldUsers, bike_like }: MapUsersProps) => {
     v1Id: user.id,
     avatarImage: [`${user.id}.jpg`], // check if file exist
     email: user.email,
-    city: user.city,
-    country: user.country,
-    aboutUser: user.about,
-    firstName: user.name,
-    lastName: user.surname,
-    name: user.nick,
-    yearOfBirth: user.birthyear.toString(),
-    gender: user.gender === "m" ? "male" : user.gender === "f" ? "female" : "",
+    city: user.city ? user.city : undefined,
+    country: user.country ? user.country : undefined,
+    aboutUser: user.about ? user.about : undefined,
+    firstName: user.name ? user.name : undefined,
+    lastName: user.surname ? user.surname : undefined,
+    name: user.nick ? user.nick : undefined,
+    yearOfBirth: user.birthyear ? user.birthyear.toString() : undefined,
+    gender: user.gender === "m" ? "male" : user.gender === "f" ? "female" : undefined,
     v1LikedVehicles: bike_like
       .filter((like) => like.user_id === user.id)
       .map((like) => like.bike_id),

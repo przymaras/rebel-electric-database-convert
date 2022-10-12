@@ -1,16 +1,16 @@
 import type { ObjectId } from "mongodb";
 
 export interface IUserAccount {
-  avatarImage: string[];
-  city: string;
-  country: string;
-  aboutUser: string;
+  avatarImage?: string[];
+  city?: string;
+  country?: string;
+  aboutUser?: string;
   email: string;
-  firstName: string;
-  gender: string;
-  lastName: string;
-  name: string;
-  yearOfBirth: string;
+  firstName?: string;
+  gender?: string;
+  lastName?: string;
+  name?: string;
+  yearOfBirth?: string;
 }
 export interface IUser extends IUserAccount {
   _id?: ObjectId;

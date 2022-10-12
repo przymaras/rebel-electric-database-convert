@@ -45,7 +45,7 @@ export const mapVehicles = ({
           ?.name as keyof typeof brakeMapOldToNew
       ] === "other"
         ? l_brake.find((brake) => brake.id === oldVehicle.brake_id)?.name ?? ""
-        : "";
+        : undefined;
 
     const vehicleImages = product_photo
       .filter((photo) => photo.product_id === oldVehicle.id)
@@ -113,18 +113,18 @@ export const mapVehicles = ({
       brakes,
       brakesOther,
       createdAt: oldVehicle.date_added,
-      description: oldVehicle.txt,
+      description: oldVehicle.txt ? oldVehicle.txt : undefined,
       v1Id: oldVehicle.id,
       v1OwnerId: oldVehicle.user_id.toString(),
       projectName: oldVehicle.name,
       vehicleImages,
-      video: oldVehicle.youtube,
+      video: oldVehicle.youtube ? oldVehicle.youtube : undefined,
       wheelSize,
       wheelOther,
-      mass: oldVehicle.weight,
-      vmax: oldVehicle.speed,
-      range: oldVehicle.bike_range,
-      ctrlCurrent: oldVehicle.watage,
+      mass: oldVehicle.weight ? oldVehicle.weight : undefined,
+      vmax: oldVehicle.speed ? oldVehicle.speed : undefined,
+      range: oldVehicle.bike_range ? oldVehicle.bike_range : undefined,
+      ctrlCurrent: oldVehicle.watage ? oldVehicle.watage : undefined,
       batteryCase,
       cellsType,
       batVoltage,

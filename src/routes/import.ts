@@ -18,6 +18,18 @@ import { mapOldToNewIdsInVehicles } from "../mappingFunctions/mapOldToNewIdsInVe
 // import { mongoDbRequest } from "../services/mongoDb/mongoDbRequest";
 // import { mDbAddUsers } from "../services/mongoDb/collections";
 
+type QueryResponseType = [
+  IOldUser[],
+  IBikeLike[],
+  IOldVehicle[],
+  IList<l_brake_type>[],
+  IProductPhoto[],
+  IList[],
+  IList[],
+  IList<l_battery_instal_type>[],
+  IList<l_accumulator_type>[]
+];
+
 export const importRoute = async (req: Request, res: Response) => {
   const rebelDb = mysql.createConnection({
     host: "mn30.webd.pl",
@@ -26,18 +38,6 @@ export const importRoute = async (req: Request, res: Response) => {
     database: `${process.env.SQL_DATABASE}`,
     multipleStatements: true,
   });
-
-  type QueryResponseType = [
-    IOldUser[],
-    IBikeLike[],
-    IOldVehicle[],
-    IList<l_brake_type>[],
-    IProductPhoto[],
-    IList[],
-    IList[],
-    IList<l_battery_instal_type>[],
-    IList<l_accumulator_type>[]
-  ];
 
   const query = util
     .promisify<string | mysql.QueryOptions, QueryResponseType>(rebelDb.query)
