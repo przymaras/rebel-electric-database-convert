@@ -15,8 +15,8 @@ import type { IBikeLike } from "../types/oldDb/bike_like";
 import { mapVehicles } from "../mappingFunctions/mapVehicles";
 import { mapOldToNewIdsInUsers } from "../mappingFunctions/mapOldToNewIdsInUsers";
 import { mapOldToNewIdsInVehicles } from "../mappingFunctions/mapOldToNewIdsInVehicles";
-// import { mongoDbRequest } from "../services/mongoDb/mongoDbRequest";
-// import { mDbAddUsers } from "../services/mongoDb/collections";
+import { mongoDbRequest } from "../services/mongoDb/mongoDbRequest";
+import { mDbAddUsers } from "../services/mongoDb/collections";
 
 type QueryResponseType = [
   IOldUser[],
@@ -86,20 +86,26 @@ export const importRoute = async (req: Request, res: Response) => {
 
     const newVehiclesWithNewIds = mapOldToNewIdsInVehicles(newUsers, newVehicles);
 
-    // const mongoResponse = await mongoDbRequest(async (db) => {
-    //   const addUsers = await mDbAddUsers(db, newUsers);
-    //   return { addUsers };
-    // });
+    if (req.query.update) {
+      const mongoResponse = await mongoDbRequest(async (db) => {
+        const addUsers = await mDbAddUsers(db, newUsersWithNewIds);
+        return { addUsers };
+      });
 
-    // if (!mongoResponse) {
-    //   return res.status(500).json({ message: "Can't connect to mongoDb" });
-    // }
+      if (!mongoResponse) {
+        return res.status(500).json({ message: "Can't connect to mongoDb" });
+      }
 
-    // const { addUsers } = mongoResponse;
+      const { addUsers } = mongoResponse;
+      console.info("update DB");
+    } else {
+      console.info("preview only");
+    }
 
-    return res
-      .status(200)
-      .json({ users: newUsersWithNewIds.slice(0, 9), vehicles: newVehiclesWithNewIds.slice(0, 9) });
+    return res.status(200).json({
+      users: newUsersWithNewIds.slice(0, 9),
+      vehicles: newVehiclesWithNewIds.slice(0, 9),
+    });
   } catch (err) {
     return res.status(500).json({
       success: false,

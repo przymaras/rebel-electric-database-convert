@@ -22,7 +22,7 @@ export interface IUser extends IUserAccount {
   profileVehiclesCount?: string;
   profileViewsCount?: string;
   testsResults?: string;
-  likedVehicles?: string[];
+  likedVehicles?: ObjectId[];
   v1LikedVehicles?: number[];
 }
 

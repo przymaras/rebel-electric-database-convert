@@ -1,3 +1,4 @@
+import { ObjectId } from "mongodb";
 import { IEBikeComplete } from "../types/hangar";
 import { IUser } from "../types/user";
 
@@ -5,12 +6,12 @@ export const mapOldToNewIdsInUsers = (newUsers: IUser[], newVehicles: IEBikeComp
   return newUsers.map((user) => {
     const userToReturn = {
       ...user,
-      likedVehicles: user.v1LikedVehicles
+      likedVehicles: (user.v1LikedVehicles
         ?.map(
           (v1LikedVehicle) =>
             newVehicles.find((newVehicle) => newVehicle.v1Id === v1LikedVehicle)?._id
         )
-        .filter((id) => Boolean(id)),
+        .filter((id) => Boolean(id)) ?? []) as ObjectId[],
     };
 
     delete userToReturn.v1Id;
