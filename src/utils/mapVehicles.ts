@@ -52,7 +52,7 @@ export const mapVehicles = ({
       .sort((a, b) =>
         a.id === oldVehicle.main_photo_id ? -1 : b.id === oldVehicle.main_photo_id ? 1 : 0
       )
-      .map((photo) => `v1-${photo.id}.jpg`);
+      .map((photo) => `dev-v1-${photo.id}.jpg`);
 
     const oldBase = l_base_brand.find((brand) => brand.id === oldVehicle.brand_id)?.name.trim();
     const oldModel = l_base_model.find((model) => model.id === oldVehicle.model_id)?.name.trim();

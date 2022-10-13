@@ -36,8 +36,8 @@ export const uploadVehicleImages = async (req: Request, res: Response) => {
         return imagekit
           .upload({
             file: `https://bikel.pl/rebel/${photoId}`, //required
-            fileName: `v1-${photoId}.jpg`, //required
-            folder: "/v1",
+            fileName: `dev-v1-${photoId}.jpg`, //required
+            folder: "/development",
             useUniqueFileName: false,
           })
           .then(() => {
