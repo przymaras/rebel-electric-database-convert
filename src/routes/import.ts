@@ -10,11 +10,11 @@ import type { IProductPhoto } from "../types/oldDb/product_photo";
 import type { l_accumulator_type } from "../types/oldDb/l_accumulator";
 import type { l_battery_instal_type } from "../types/oldDb/l_battery_install";
 import type { l_brake_type } from "../types/oldDb/l_brake";
-import { mapUsers } from "../mappingFunctions/mapUsers";
+import { mapUsers } from "../utils/mapUsers";
 import type { IBikeLike } from "../types/oldDb/bike_like";
-import { mapVehicles } from "../mappingFunctions/mapVehicles";
-import { mapOldToNewIdsInUsers } from "../mappingFunctions/mapOldToNewIdsInUsers";
-import { mapOldToNewIdsInVehicles } from "../mappingFunctions/mapOldToNewIdsInVehicles";
+import { mapVehicles } from "../utils/mapVehicles";
+import { mapOldToNewIdsInUsers } from "../utils/mapOldToNewIdsInUsers";
+import { mapOldToNewIdsInVehicles } from "../utils/mapOldToNewIdsInVehicles";
 import { mongoDbRequest } from "../services/mongoDb/mongoDbRequest";
 import { mDbAddUsers, mDbAddVehicles } from "../services/mongoDb/collections";
 
