@@ -17,6 +17,7 @@ import { mapOldToNewIdsInUsers } from "../utils/mapOldToNewIdsInUsers";
 import { mapOldToNewIdsInVehicles } from "../utils/mapOldToNewIdsInVehicles";
 import { mongoDbRequest } from "../services/mongoDb/mongoDbRequest";
 import { mDbAddUsers, mDbAddVehicles } from "../services/mongoDb/collections";
+import { getVehiclesWithNoImages } from "../utils/getVehiclesWithNoImages";
 
 type QueryResponseType = [
   IOldUser[],
@@ -86,10 +87,25 @@ export const importRoute = async (req: Request, res: Response) => {
 
     const newVehiclesWithNewIds = mapOldToNewIdsInVehicles(newUsers, newVehicles);
 
+    const vehiclesWithNoImages = getVehiclesWithNoImages(newVehiclesWithNewIds);
+
+    const newVehiclesWithPhotos = newVehiclesWithNewIds.filter(
+      (vehicle) =>
+        !vehiclesWithNoImages.some((noImageVehicle) => noImageVehicle._id === vehicle._id)
+    );
+
+    const newUsersWithoutExcessLikes = newUsersWithNewIds.map((user) => ({
+      ...user,
+      likedVehicles: user.likedVehicles.filter(
+        (likedId) =>
+          !vehiclesWithNoImages.some((vehicleWithNoImage) => vehicleWithNoImage._id === likedId)
+      ),
+    }));
+
     if (req.query.update) {
       const mongoResponse = await mongoDbRequest(async (db) => {
-        const addUsers = await mDbAddUsers(db, newUsersWithNewIds);
-        const addVehicles = await mDbAddVehicles(db, newVehiclesWithNewIds);
+        const addUsers = await mDbAddUsers(db, newUsersWithoutExcessLikes);
+        const addVehicles = await mDbAddVehicles(db, newVehiclesWithPhotos);
         return { addUsers, addVehicles };
       });
 
@@ -105,8 +121,9 @@ export const importRoute = async (req: Request, res: Response) => {
     }
 
     return res.status(200).json({
-      users: newUsersWithNewIds.slice(0, 9),
-      vehicles: newVehiclesWithNewIds.slice(0, 9),
+      vehiclesWithNoImages: vehiclesWithNoImages,
+      users: newUsersWithoutExcessLikes.slice(0, 9),
+      vehicles: newVehiclesWithPhotos.slice(0, 9),
     });
   } catch (err) {
     return res.status(500).json({
