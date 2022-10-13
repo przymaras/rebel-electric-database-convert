@@ -1,7 +1,8 @@
 import { ObjectId } from "mongodb";
-import { IBikeLike } from "../types/oldDb/bike_like";
-import { IOldUser } from "../types/oldDb/user";
-import { IUser } from "../types/user";
+import type { IBikeLike } from "../types/oldDb/bike_like";
+import { mapOldToNewCountries } from "../types/oldDb/user";
+import type { IOldUser } from "../types/oldDb/user";
+import type { IUser } from "../types/user";
 
 interface MapUsersProps {
   oldUsers: IOldUser[];
@@ -15,7 +16,9 @@ export const mapUsers = ({ oldUsers, bike_like }: MapUsersProps) => {
     avatarImage: [`${user.id}.jpg`], // check if file exist
     email: user.email,
     city: user.city ? user.city : undefined,
-    country: user.country ? user.country : undefined,
+    country: user.country
+      ? mapOldToNewCountries[user.country as keyof typeof mapOldToNewCountries]
+      : undefined,
     aboutUser: user.about ? user.about : undefined,
     firstName: user.name ? user.name : undefined,
     lastName: user.surname ? user.surname : undefined,

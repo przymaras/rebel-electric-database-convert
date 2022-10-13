@@ -21,3 +21,30 @@ export interface IOldUser {
   about: string;
   del_val: number;
 }
+
+type OldCountriesType =
+  | "Belgia"
+  | "Niderlandy"
+  | "Niemcy"
+  | "Norwegia"
+  | "Polska"
+  | "Słowacja"
+  | "Stany Zjednoczone"
+  | "Szwecja"
+  | "Ukraina"
+  | "Wielka Brytania"
+  | "Włochy";
+
+export const mapOldToNewCountries: Record<OldCountriesType, string> = {
+  Belgia: "BE",
+  Niderlandy: "NL",
+  Niemcy: "DE",
+  Norwegia: "NO",
+  Polska: "PL",
+  Słowacja: "SK",
+  "Stany Zjednoczone": "US",
+  Szwecja: "SE",
+  Ukraina: "UA",
+  "Wielka Brytania": "GB",
+  Włochy: "IT",
+};
