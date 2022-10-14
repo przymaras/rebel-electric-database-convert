@@ -5,6 +5,8 @@ import mysql from "mysql";
 import util from "util";
 import ImageKit from "imagekit";
 
+import { throttledPromises } from "../utils/promiseThrottling";
+
 export const uploadVehicleImages = async (req: Request, res: Response) => {
   const rebelDb = mysql.createConnection({
     host: "mn30.webd.pl",
@@ -24,37 +26,32 @@ export const uploadVehicleImages = async (req: Request, res: Response) => {
   });
 
   try {
-    const uploadedImages: number[] = [];
-    const errorImages: number[] = [];
     const photos = await query(`SELECT * FROM product_photo`);
     rebelDb.end();
 
     const photosIds = photos.map((photo) => photo.id);
 
-    await Promise.allSettled(
-      photosIds.map((photoId) => {
-        return imagekit
+    const upload = async (photoId: string) => {
+      return new Promise((resolve, reject) =>
+        imagekit
           .upload({
-            file: `https://bikel.pl/rebel/${photoId}`, //required
-            fileName: `dev-v1-${photoId}.jpg`, //required
+            file: `https://bikel.pl/rebel/${photoId}`,
+            fileName: `dev-v1-${photoId}.jpg`,
             folder: "/development",
             useUniqueFileName: false,
           })
-          .then(() => {
-            uploadedImages.push(photoId);
-            console.info(`Uploaded: ${photoId}`);
-          })
-          .catch(() => {
-            errorImages.push(photoId);
-            console.error(`Error upload: ${photoId}`);
-          });
-      })
-    );
+          .then(() => resolve(photoId))
+          .catch(() => reject(photoId))
+      );
+    };
 
-    errorImages.sort((a, b) => a - b);
-    uploadedImages.sort((a, b) => a - b);
+    const results = await throttledPromises(upload, photosIds, 10, 5);
 
-    return res.status(200).json({ message: "Upload results", errorImages, uploadedImages });
+    const errorImages = results
+      .filter((result) => result.status === "rejected")
+      .map((result) => result?.reason ?? 0);
+
+    return res.status(200).json({ message: "Upload complete.", errorImages });
   } catch (err) {
     return res.status(500).json({
       success: false,
