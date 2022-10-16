@@ -6,7 +6,7 @@ export const mongoDbRequest = async <ResponseType>(request: (db: Db) => Promise<
   try {
     const client = await clientPromise;
     if (!client) return undefined;
-    const db = client.db();
+    const db = client.db(undefined, { ignoreUndefined: true });
     const mongoDbResponse: ResponseType = await request(db);
     return mongoDbResponse;
   } catch (err) {
