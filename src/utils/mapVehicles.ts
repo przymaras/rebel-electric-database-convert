@@ -12,6 +12,7 @@ import { overlappingVoltages } from "../types/oldDb/voltage";
 import { wheelsMapOldToNew } from "../types/oldDb/wheels";
 
 interface MapVehiclesProps {
+  isProduction?: boolean;
   oldVehicles: IOldVehicle[];
   l_brake: IList<l_brake_type>[];
   product_photo: IProductPhoto[];
@@ -23,6 +24,7 @@ interface MapVehiclesProps {
 }
 
 export const mapVehicles = ({
+  isProduction,
   oldVehicles,
   l_brake,
   product_photo,
@@ -47,12 +49,14 @@ export const mapVehicles = ({
         ? l_brake.find((brake) => brake.id === oldVehicle.brake_id)?.name ?? ""
         : undefined;
 
+    const prefix = isProduction ? "hangar" : "dev";
+
     const vehicleImages = product_photo
       .filter((photo) => photo.product_id === oldVehicle.id)
       .sort((a, b) =>
         a.id === oldVehicle.main_photo_id ? -1 : b.id === oldVehicle.main_photo_id ? 1 : 0
       )
-      .map((photo) => `dev-v1-${photo.id}.jpg`);
+      .map((photo) => `${prefix}-v1-${photo.id}.jpg`);
 
     const oldBase = l_base_brand.find((brand) => brand.id === oldVehicle.brand_id)?.name.trim();
     const oldModel = l_base_model.find((model) => model.id === oldVehicle.model_id)?.name.trim();

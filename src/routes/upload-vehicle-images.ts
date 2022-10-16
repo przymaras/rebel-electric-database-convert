@@ -31,13 +31,17 @@ export const uploadVehicleImages = async (req: Request, res: Response) => {
 
     const photosIds = photos.map((photo) => photo.id);
 
+    const isProduction = Boolean(req.query.production);
+    const prefix = isProduction ? "hangar" : "dev";
+    const folder = isProduction ? "/hangar" : "/development";
+
     const upload = async (photoId: string) => {
       return new Promise((resolve, reject) =>
         imagekit
           .upload({
             file: `https://bikel.pl/rebel/${photoId}`,
-            fileName: `dev-v1-${photoId}.jpg`,
-            folder: "/development",
+            fileName: `${prefix}-v1-${photoId}.jpg`,
+            folder: folder,
             useUniqueFileName: false,
           })
           .then(() => resolve(photoId))

@@ -32,6 +32,8 @@ type QueryResponseType = [
 ];
 
 export const importRoute = async (req: Request, res: Response) => {
+  const isProduction = Boolean(req.query.production);
+
   const rebelDb = mysql.createConnection({
     host: "mn30.webd.pl",
     user: `${process.env.SQL_USER}`,
@@ -73,6 +75,7 @@ export const importRoute = async (req: Request, res: Response) => {
     const newUsers = mapUsers({ oldUsers, bike_like });
 
     const newVehicles = mapVehicles({
+      isProduction,
       oldVehicles,
       l_brake,
       product_photo,
