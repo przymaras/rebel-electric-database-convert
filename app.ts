@@ -10,6 +10,7 @@ import { uploadVehicleImages } from "./src/routes/upload-vehicle-images";
 import { uploadVehicleImagesRetry } from "./src/routes/upload-vehicle-images-retry";
 import { importRoute } from "./src/routes/import";
 import { controllersRoute } from "./src/routes/controllers";
+import { motorsRoute } from "./src/routes/motors";
 
 const app = express();
 const port = 3030;
@@ -40,6 +41,8 @@ app.get("/upload-vehicle-images-retry", uploadVehicleImagesRetry);
 app.get("/import", importRoute);
 
 app.get("/controllers", controllersRoute);
+
+app.get("/motors", motorsRoute);
 
 // This spins up our sever and generates logs for us to use.
 app.listen(port, () => console.log(`Rebel electric database convert API listens on port ${port}!`));
