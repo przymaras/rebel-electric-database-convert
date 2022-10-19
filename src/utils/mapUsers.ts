@@ -5,15 +5,17 @@ import type { IOldUser } from "../types/oldDb/user";
 import type { IUser } from "../types/user";
 
 interface MapUsersProps {
+  isProduction?: boolean;
   oldUsers: IOldUser[];
   bike_like: IBikeLike[];
 }
 
-export const mapUsers = ({ oldUsers, bike_like }: MapUsersProps) => {
+export const mapUsers = ({ isProduction, oldUsers, bike_like }: MapUsersProps) => {
+  const prefix = isProduction ? "avatar" : "dev-avatar";
   return oldUsers.map<IUser>((user) => ({
     _id: new ObjectId(),
     v1Id: user.id,
-    avatarImage: [`${user.id}.jpg`], // check if file exist
+    avatarImage: [`${prefix}-v1-${user.id}.jpg`], // check if file exist
     email: user.email,
     city: user.city ? user.city : undefined,
     country: user.country

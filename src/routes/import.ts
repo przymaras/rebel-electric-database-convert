@@ -72,7 +72,7 @@ export const importRoute = async (req: Request, res: Response) => {
     );
     rebelDb.end();
 
-    const newUsers = mapUsers({ oldUsers, bike_like });
+    const newUsers = mapUsers({ isProduction, oldUsers, bike_like });
 
     const newVehicles = mapVehicles({
       isProduction,

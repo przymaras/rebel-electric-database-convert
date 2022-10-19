@@ -11,6 +11,7 @@ import { uploadVehicleImagesRetry } from "./src/routes/upload-vehicle-images-ret
 import { importRoute } from "./src/routes/import";
 import { controllersRoute } from "./src/routes/controllers";
 import { motorsRoute } from "./src/routes/motors";
+import { uploadAvatarImages } from "./src/routes/upload-avatar-images";
 
 const app = express();
 const port = 3030;
@@ -37,6 +38,8 @@ app.get("/", (req, res) => res.send("Hello World!"));
 app.get("/upload-vehicle-images", uploadVehicleImages);
 
 app.get("/upload-vehicle-images-retry", uploadVehicleImagesRetry);
+
+app.get("/upload-avatar-images", uploadAvatarImages);
 
 app.get("/import", importRoute);
 
