@@ -140,7 +140,7 @@ export const mapVehicles = ({
       rangeUnit: "km",
       category: categoryMapOldToNew[oldVehicle.kind_id as keyof typeof categoryMapOldToNew],
       v1LikedUsers,
-      v1ViewsCount: oldVehicle.views,
+      viewsCount: oldVehicle.views,
     };
   });
 };

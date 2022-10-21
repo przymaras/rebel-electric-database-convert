@@ -4,11 +4,10 @@ export interface IEBikeComplete extends Partial<IEBikeGeneral> {
   v1Id?: number;
   v1OwnerId?: string;
   v1LikedUsers?: number[];
-  v1ViewsCount?: number;
   createdAt: string;
   likesCount?: string;
   likedUsers?: ObjectId[];
-  viewsCount?: string;
+  viewsCount?: number;
   ownerId?: ObjectId;
 }
 export interface IEBikeGeneral {
